@@ -1,0 +1,11 @@
+DarkMonopoly
+Copyright (c) 2025 Adrian
+
+Ce logiciel est distribué sous licence MIT (voir LICENSE).
+
+L'édition française du plateau s'inspire du Monopoly classique édité par Hasbro.
+DarkMonopoly est un projet indépendant, éducatif et non commercial, sans affiliation
+avec Hasbro, Parker Brothers, ni aucun de leurs ayants droit.
+
+"Monopoly" est une marque déposée de Hasbro. Le nom "DarkMonopoly" est utilisé ici
+à des fins de description et de parodie, dans un cadre strictement non commercial.
