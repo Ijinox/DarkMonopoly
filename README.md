@@ -187,7 +187,7 @@ Voici la description prête à copier-coller dans un **GitHub Release** (ou en h
 
 # 🌃 DarkMonopoly v7.0 — Mains publiques en PvP
 
-**Date de sortie :** Octobre 2025
+**Date de sortie :** Octobre 2026
 **Compatibilité :** Python 3.10+ · Windows / Linux / macOS
 **Type :** Release majeure (correctifs + nouvelles fonctionnalités)
 
