@@ -180,6 +180,194 @@ Projet né d'une envie de faire de l'**expérience de pensée économique** en s
 
 ---
 
+
+Voici la description prête à copier-coller dans un **GitHub Release** (ou en haut du README). Je l'ai écrite dans le format standard des releases GitHub.
+
+---
+
+# 🌃 DarkMonopoly v7.0 — Mains publiques en PvP
+
+**Date de sortie :** Octobre 2025
+**Compatibilité :** Python 3.10+ · Windows / Linux / macOS
+**Type :** Release majeure (correctifs + nouvelles fonctionnalités)
+
+---
+
+## 📖 À propos
+
+**DarkMonopoly** est un laboratoire d'expériences économiques sous forme de Monopoly modifiable. Chaque joueur incarne une entreprise, le monopole est aboli, et les cartes Cheat permettent de hacker le système pour tester des modèles économiques alternatifs.
+
+Prototype en un seul fichier Python. Aucune dépendance externe.
+
+---
+
+## ✨ Nouveautés v7.0
+
+### 🎴 Mains publiques en mode PvP
+
+Quand tous les joueurs sont humains (mode PvP local), **toutes les mains sont affichées** en bas du plateau. Une ligne par joueur, avec sa couleur, son nombre de cartes et ses cartes visibles.
+
+- **Mode Solo/Mixte** : seule la main de l'humain courant reste visible. Les cartes des IA sont cachées.
+- **Mode PvP** : transparence totale — utile pour jouer à plusieurs sur un même PC.
+- **Clic sur une carte** (ligne du joueur courant uniquement) → popup d'activation ou de conservation.
+
+### 🎨 Thème "Clair" retravaillé
+
+Le thème clair manquait de contraste. Les boutons passent d'un gris pastel à un **gris franc** (`#d1d5db`), avec bordures renforcées (`#94a3b8`). Le cadre des terrains libres devient foncé (`#1f2937`) pour rester lisible sur fond blanc.
+
+### 🧠 Refonte du système de cartes IA
+
+La gestion des cartes est maintenant **centralisée** dans `_end_turn()`, point unique de passage garanti pour tous les joueurs.
+
+---
+
+## 🐛 Correctifs
+
+### Bug critique : blocage sur case CARTE (IA)
+
+**Symptôme** : un bot tombait sur une case CARTE, piochait, mais ne jouait jamais sa main. Les cartes s'accumulaient. Dans certains cas (double + 3 doubles d'affilée), le jeu se figeait complètement.
+
+**Cause** : la résolution des cartes IA était éparpillée dans plusieurs méthodes avec des `return` prématurés qui court-circuitaient l'appel de fin.
+
+**Correctif** :
+- Nouvelle méthode `_play_ai_hand()` appelée **uniquement** depuis `_end_turn()`
+- `try/except` sur chaque effet de carte → aucune exception ne peut plus figer le jeu
+- `refresh()` systématique après chaque pioche (IA incluse)
+- Suppression de l'ancienne logique redondante `_ai_play_cards_then_end()`
+
+### Bug secondaire : absence de feedback visuel
+
+Lorsqu'un bot piochait une carte, rien ne bougeait à l'écran. Maintenant, `refresh()` est appelé immédiatement après chaque pioche.
+
+---
+
+## 🔧 Notes techniques
+
+| Aspect | Détail |
+|---|---|
+| **Fichier unique** | `darkmonopoly_v7.py` (~2700 lignes) |
+| **Dépendances** | Aucune (Tkinter inclus dans Python) |
+| **Architecture** | Modèle (Game/Player) · Vue (Canvas) · Contrôleur (boutons/clavier) |
+| **Déterminisme** | Deck mélangé une seule fois avec un RNG dédié (`random.Random(seed)`) |
+| **Reproductibilité** | Même seed → mêmes dés, mêmes cartes |
+| **Protection callbacks** | `session_id` invalide les callbacks fantômes |
+| **Hauteur dynamique** | Le panneau main s'adapte au nombre de joueurs en PvP |
+
+---
+
+## 🎮 Modes de jeu disponibles
+
+| Mode | Description |
+|---|---|
+| **Solo** | 1 humain vs 2-3 IA |
+| **PvP local** | 2 à 4 humains sur le même PC (mains publiques) |
+| **Duel 2v2** | 2 équipes de 2 humains |
+| **Coop** | 2 humains vs 2 IA (équipes) |
+
+---
+
+## ⚙️ Règles principales
+
+- **Objectif** : premier à 2500€ de patrimoine net (extensible à 100 tours / objectif 5000€)
+- **Mode Investisseur** : pas de monopole, constructions libres, max 3 maisons par case
+- **Premier tour** : aucun loyer pendant le premier tour de chaque joueur
+- **Terrains Libres** : possibilité de copier une propriété existante en payant son prix
+- **3 doubles** : envoi forcé sur la case CARTE et perte du tour
+
+---
+
+## 🚀 Installation
+
+```bash
+# Cloner le dépôt
+git clone https://github.com/Ijinox/DarkMonopoly.git
+cd DarkMonopoly
+
+# Lancer (aucune dépendance à installer)
+python darkmonopoly_v7.py
+```
+
+**Raccourcis clavier :**
+- `Espace` → Lancer les dés
+- `Entrée` → Terminer le tour
+- `B` → Construire
+- `I` → Info case survolée
+- `F1` → Règles
+- `Ctrl+E` → Exporter le journal
+- `Ctrl+N` → Nouvelle partie
+- `Échap` → Retour au menu
+
+---
+
+## ⚠️ Limitations connues
+
+- **PvP local** : pas de système "passe le clavier". Les dialogues s'affichent à tour de rôle sans vérification. Chaque joueur doit faire attention à ne pas cliquer pour les autres.
+- **Pas de sauvegarde de partie** (l'export se limite au journal texte).
+- **IA basique** : prend ses décisions de manière déterministe (pas de stratégie adaptative).
+- **Rendu naïf** : le plateau est redessiné intégralement à chaque changement d'état. Fluide pour 24 cases, mais non optimisé pour un plateau plus grand.
+
+---
+
+## 🗺️ Feuille de route v8+
+
+- [ ] Sauvegarde / chargement de partie en JSON
+- [ ] IA personnalisables (agressive / prudente / opportuniste)
+- [ ] Métriques de fin (Gini, inflation, concentration)
+- [ ] Mode "passe le clavier" pour le vrai PvP local
+- [ ] Statistiques post-partie avec courbes
+- [ ] Version web (PWA) pour mobile
+
+---
+
+## 🧪 Testé sur
+
+- Windows 11 · Python 3.12
+- Linux Ubuntu 24.04 · Python 3.11
+- Tkinter 8.6+
+
+---
+
+## 📜 Licence
+
+MIT — voir [`LICENSE`](LICENSE)
+
+---
+
+## 👤 Auteur
+
+**Adrian Daniel ANTONIAK** ([@Ijinox](https://github.com/Ijinox))
+
+Projet né d'une envie de faire de l'expérience de pensée économique en s'amusant avec un Monopoly qu'on peut casser.
+
+> *"Le Monopoly est un jeu où l'on apprend vite que le hasard et la rente valent mieux que le travail. DarkMonopoly, c'est voir ce qu'on peut en faire quand on triche avec le règlement."*
+
+---
+
+## 🙏 Contribuer
+
+Les retours, idées et Pull Requests sont bienvenus. Voir [`CONTRIBUTING.md`](CONTRIBUTING.md) pour le workflow.
+
+**Signaler un bug** → ouvrir une issue avec le template dédié (version Python, OS, étapes de reproduction).
+
+---
+
+**Changelog complet** : voir [`CHANGELOG.md`](CHANGELOG.md)
+
+---
+
+### 🏷️ Tags
+
+`python` `tkinter` `game` `simulation` `economy` `serious-game` `open-source` `monopoly` `pvp` `strategy`
+
+---
+
+Tu peux copier ce texte directement :
+
+- **Comme GitHub Release** : va dans `Releases → Draft a new release`, colle le contenu, coche "Set as latest release"
+- **Comme README** : remplace la section actuelle en gardant les liens vers `LICENSE`, `CONTRIBUTING.md`, etc.
+- **Comme post LinkedIn** : garde uniquement les sections **"Nouveautés"** et **"Correctifs"** — ça fait un post court et percutant
+
+Tu veux que je te prépare aussi le **CHANGELOG.md** mis à jour avec toutes les versions depuis la v1 ?
 ## 🙏 Remerciements
 
 - À tous ceux qui jouent, cassent, et proposent des règles.
